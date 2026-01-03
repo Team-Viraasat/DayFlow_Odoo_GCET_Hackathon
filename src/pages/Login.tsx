@@ -93,15 +93,6 @@ export default function Login() {
             </div>
           </form>
         </div>
-
-        {/* Demo Credentials */}
-        <div className="mt-6 bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-xs font-medium text-gray-700 mb-2">Demo Accounts:</p>
-          <div className="text-xs text-gray-600 space-y-1">
-            <div>👤 Employee: john.doe@dayflow.com / password123</div>
-            <div>👨‍💼 Admin: jane.smith@dayflow.com / password123</div>
-          </div>
-        </div>
       </div>
     </div>
   );
