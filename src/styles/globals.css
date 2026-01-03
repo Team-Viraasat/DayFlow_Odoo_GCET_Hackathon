@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-purple: #714B67;
+  --primary-purple-dark: #5f3f58;
+  --primary-purple-light: #8b5f80;
+  --accent-purple: #9b6b92;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-900: #111827;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
