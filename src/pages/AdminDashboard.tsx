@@ -104,6 +104,12 @@ export default function AdminDashboard() {
       description: 'Manage compensation and salaries',
       path: '/payroll',
     },
+    {
+      icon: Users,
+      title: 'Add Employee',
+      description: 'Create a new employee account',
+      path: '/admin/add-employee',
+    },    
   ];
 
   return (

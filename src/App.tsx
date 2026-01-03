@@ -14,6 +14,7 @@ import EmployeeLeave from './pages/EmployeeLeave';
 import AdminLeave from './pages/AdminLeave';
 import EmployeePayroll from './pages/EmployeePayroll';
 import AdminPayroll from './pages/AdminPayroll';
+import AdminAddEmployee from './pages/AdminAddEmployee';
 
 function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
   const { currentUser, isAuthenticated } = useAuth();
@@ -115,6 +116,14 @@ function AppRoutes() {
         }
       />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route
+        path="/admin/add-employee"
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminAddEmployee />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
