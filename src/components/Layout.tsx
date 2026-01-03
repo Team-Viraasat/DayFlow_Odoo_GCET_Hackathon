@@ -1,6 +1,6 @@
 import { ReactNode, useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { LayoutDashboard, UserCircle, Calendar, FileText, DollarSign, LogOut, Users, Clock, Menu, X } from 'lucide-react';
 
 interface LayoutProps {

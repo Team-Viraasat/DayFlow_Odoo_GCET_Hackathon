@@ -1,33 +1,42 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
-import Onboarding from './pages/Onboarding';
-import EmployeeDashboard from './pages/EmployeeDashboard';
-import AdminDashboard from './pages/AdminDashboard';
-import Profile from './pages/Profile';
-import EmployeeList from './pages/EmployeeList';
-import EmployeeProfile from './pages/EmployeeProfile';
-import EmployeeAttendance from './pages/EmployeeAttendance';
-import AdminAttendance from './pages/AdminAttendance';
-import EmployeeLeave from './pages/EmployeeLeave';
-import AdminLeave from './pages/AdminLeave';
-import EmployeePayroll from './pages/EmployeePayroll';
-import AdminPayroll from './pages/AdminPayroll';
-import AdminAddEmployee from './pages/AdminAddEmployee';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
-function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
-  const { currentUser, isAuthenticated } = useAuth();
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import Onboarding from "./pages/Onboarding";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import Profile from "./pages/Profile";
+import EmployeeList from "./pages/EmployeeList";
+import EmployeeProfile from "./pages/EmployeeProfile";
+import EmployeeAttendance from "./pages/EmployeeAttendance";
+import AdminAttendance from "./pages/AdminAttendance";
+import EmployeeLeave from "./pages/EmployeeLeave";
+import AdminLeave from "./pages/AdminLeave";
+import EmployeePayroll from "./pages/EmployeePayroll";
+import AdminPayroll from "./pages/AdminPayroll";
+import AdminAddEmployee from "./pages/AdminAddEmployee";
 
-  if (!isAuthenticated) {
+function ProtectedRoute({
+  children,
+  adminOnly = false,
+}: {
+  children: React.ReactNode;
+  adminOnly?: boolean;
+}) {
+  const { user, profile, loading } = useAuth();
+
+  if (loading) return null;
+
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (currentUser?.needsOnboarding) {
+  if (profile?.needs_onboarding) {
     return <Navigate to="/onboarding" replace />;
   }
 
-  if (adminOnly && currentUser?.role !== 'admin') {
+  if (adminOnly && profile?.role !== "admin") {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -35,38 +44,50 @@ function ProtectedRoute({ children, adminOnly = false }: { children: React.React
 }
 
 function AppRoutes() {
-  const { currentUser, isAuthenticated } = useAuth();
+  const { user, profile, loading } = useAuth();
+
+  if (loading) return null;
 
   return (
     <Routes>
-      <Route 
-        path="/login" 
-        element={
-          isAuthenticated ? 
-            (currentUser?.needsOnboarding ? <Navigate to="/onboarding" replace /> : <Navigate to="/dashboard" replace />) 
-            : <Login />
-        } 
-      />
-      <Route 
-        path="/signup" 
-        element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUp />
-        } 
-      />
       <Route
-        path="/onboarding"
+        path="/login"
         element={
-          isAuthenticated ? <Onboarding /> : <Navigate to="/login" replace />
+          user ? (
+            profile?.needs_onboarding ? (
+              <Navigate to="/onboarding" replace />
+            ) : (
+              <Navigate to="/dashboard" replace />
+            )
+          ) : (
+            <Login />
+          )
         }
       />
+
+      <Route
+        path="/signup"
+        element={user ? <Navigate to="/dashboard" replace /> : <SignUp />}
+      />
+
+      <Route
+        path="/onboarding"
+        element={user ? <Onboarding /> : <Navigate to="/login" replace />}
+      />
+
       <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
-            {currentUser?.role === 'admin' ? <AdminDashboard /> : <EmployeeDashboard />}
+            {profile?.role === "admin" ? (
+              <AdminDashboard />
+            ) : (
+              <EmployeeDashboard />
+            )}
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/profile"
         element={
@@ -75,6 +96,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/employees"
         element={
@@ -83,6 +105,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/employee/:employeeId"
         element={
@@ -91,31 +114,42 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/attendance"
         element={
           <ProtectedRoute>
-            {currentUser?.role === 'admin' ? <AdminAttendance /> : <EmployeeAttendance />}
+            {profile?.role === "admin" ? (
+              <AdminAttendance />
+            ) : (
+              <EmployeeAttendance />
+            )}
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/leave"
         element={
           <ProtectedRoute>
-            {currentUser?.role === 'admin' ? <AdminLeave /> : <EmployeeLeave />}
+            {profile?.role === "admin" ? <AdminLeave /> : <EmployeeLeave />}
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/payroll"
         element={
           <ProtectedRoute>
-            {currentUser?.role === 'admin' ? <AdminPayroll /> : <EmployeePayroll />}
+            {profile?.role === "admin" ? (
+              <AdminPayroll />
+            ) : (
+              <EmployeePayroll />
+            )}
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
       <Route
         path="/admin/add-employee"
         element={
@@ -124,6 +158,8 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }

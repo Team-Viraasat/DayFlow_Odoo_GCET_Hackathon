@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import { User, Calendar, FileText, DollarSign } from 'lucide-react';
 

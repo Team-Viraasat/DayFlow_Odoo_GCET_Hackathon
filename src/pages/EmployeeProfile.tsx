@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import { User, Edit2, X, Upload, ArrowLeft } from 'lucide-react';
 import { getSalaryData, saveSalaryData } from '../utils/salaryCalculations';

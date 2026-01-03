@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const [emailOrId, setEmailOrId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -15,13 +15,14 @@ export default function Login() {
     setError('');
     setLoading(true);
 
-    const result = await login(emailOrId, password);
-    
-    if (!result.success) {
-      setError(result.error || 'Login failed');
+    try {
+      await signIn(emailOrId, password);
+      // redirect handled by App routing
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (

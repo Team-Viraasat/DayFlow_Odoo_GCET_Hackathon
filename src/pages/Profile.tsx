@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import { User, Edit2, X, Upload } from 'lucide-react';
 

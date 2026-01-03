@@ -1,16 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-console.log("ENV CHECK", {
-  hasUrl: !!Deno.env.get("SUPABASE_URL"),
-  hasServiceKey: !!Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
-});
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
-  // ✅ HANDLE PREFLIGHT FIRST
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -39,57 +37,62 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  // employee id generation
-  const { count } = await supabase
+  // Generate employee ID
+  const { count, error: countError } = await supabase
     .from("profiles")
     .select("*", { count: "exact", head: true });
 
+  if (countError) {
+    return new Response(countError.message, {
+      status: 500,
+      headers: corsHeaders,
+    });
+  }
+
   const year = new Date().getFullYear();
   const employeeId =
-    `OI${firstName.slice(0,2).toUpperCase()}${lastName.slice(0,2).toUpperCase()}${year}` +
+    `OI${firstName.slice(0, 2).toUpperCase()}${lastName
+      .slice(0, 2)
+      .toUpperCase()}${year}` +
     String((count ?? 0) + 1).padStart(4, "0");
 
   const tempPassword = Math.random().toString(36).slice(-10);
 
+  // Create auth user (NO triggers involved now)
   const { data, error } = await supabase.auth.admin.createUser({
     email,
     password: tempPassword,
     email_confirm: true,
-    user_metadata: {
-      employee_id: employeeId,
-      role,
-      first_name: firstName,
-      last_name: lastName,
-    },
   });
 
-    if (error) {
+  if (error) {
     console.error("ADMIN CREATE USER ERROR:", error);
-    return new Response(
-        JSON.stringify({
-        message: error.message,
-        details: error,
-        }),
-        {
-        status: 400,
-        headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-        },
-        }
-    );
-    }
+    return new Response(error.message, {
+      status: 400,
+      headers: corsHeaders,
+    });
+  }
 
-  await supabase
-    .from("profiles")
-    .update({
-      employee_id: employeeId,
-      first_name: firstName,
-      last_name: lastName,
-      role,
-      needs_onboarding: true,
-    })
-    .eq("id", data.user.id);
+  // Explicitly insert profile (SAFE)
+    const { error: profileError } = await supabase.from("profiles").insert({
+    id: data.user.id,
+    email,
+    login_id: employeeId,
+    employee_id: employeeId,
+    first_name: firstName,
+    last_name: lastName,
+    role,
+    needs_onboarding: true,
+    });
+
+
+  if (profileError) {
+    console.error("PROFILE INSERT ERROR:", profileError);
+    return new Response(profileError.message, {
+      status: 500,
+      headers: corsHeaders,
+    });
+  }
 
   return new Response(
     JSON.stringify({ employeeId, tempPassword }),

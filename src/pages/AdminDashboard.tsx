@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import { Users, Calendar, FileCheck, DollarSign, AlertCircle } from 'lucide-react';
 
