@@ -8,7 +8,7 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showCheckIn, setShowCheckIn] = useState(false);
@@ -92,7 +92,7 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const handleLogout = () => {
-    logout();
+    signOut();
     navigate('/login');
   };
 
