@@ -24,19 +24,15 @@ function ProtectedRoute({
   children: React.ReactNode;
   adminOnly?: boolean;
 }) {
-  const { user, profile, loading } = useAuth();
+  const { profile, loading } = useAuth();
 
   if (loading) return null;
 
-  if (!user) {
+  if (!profile) {
     return <Navigate to="/login" replace />;
   }
 
-  if (profile?.needs_onboarding) {
-    return <Navigate to="/onboarding" replace />;
-  }
-
-  if (adminOnly && profile?.role !== "admin") {
+  if (adminOnly && profile.role !== "admin") {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -44,21 +40,19 @@ function ProtectedRoute({
 }
 
 function AppRoutes() {
-  const { user, profile, loading } = useAuth();
+  const { profile, loading } = useAuth();
 
   if (loading) return null;
+
+  const isAuthenticated = !!profile;
 
   return (
     <Routes>
       <Route
         path="/login"
         element={
-          user ? (
-            profile?.needs_onboarding ? (
-              <Navigate to="/onboarding" replace />
-            ) : (
-              <Navigate to="/dashboard" replace />
-            )
+          isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
           ) : (
             <Login />
           )
@@ -67,12 +61,13 @@ function AppRoutes() {
 
       <Route
         path="/signup"
-        element={user ? <Navigate to="/dashboard" replace /> : <SignUp />}
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUp />}
       />
 
+      {/* Onboarding kept for structure, but demo skips it */}
       <Route
         path="/onboarding"
-        element={user ? <Onboarding /> : <Navigate to="/login" replace />}
+        element={isAuthenticated ? <Onboarding /> : <Navigate to="/login" replace />}
       />
 
       <Route
